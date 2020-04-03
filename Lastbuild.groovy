@@ -1,5 +1,15 @@
 node { 
-properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '5'))])
+properties([
+  // keeps only last 5
+  buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '5'))
+  
+  pipelineTriggers([
+    // runs with an input
+    upstream('Input'),
+    // execute every minute
+    cron('* * * * *')])  
+  ])
+])
   stage("Stage1"){ 
     git 'https://github.com/farrukh90/packer.git' 
 } 
