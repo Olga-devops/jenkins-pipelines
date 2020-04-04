@@ -23,6 +23,12 @@ node {
 				'v0.5'],  
             description: 'Which version should we deploy?',  
             name: 'Version')
+			
+			// Asks for an input
+			string(defaultValue: 'v1', 
+			description: 'Please enter version number', 
+			name: 'APP_VERSION', 
+			trim: true)
 		])
 	])
 
