@@ -6,7 +6,7 @@ node {
 		// Below line triggers this job every minute
 		pipelineTriggers([pollSCM('* * * * *')]),
 		parameters([
-			// Asks for environment to build
+			// Asks for Environment to Build
 			choice(choices: [
 			'dev1.olgaojjeh.com', 
 			'qa1.olgaojjeh.com', 
@@ -14,27 +14,30 @@ node {
 			'prod1.olgaojjeh.com'], 
 			description: 'Please choose an environment', 
 			name: 'ENVIR'),
-			// Asks for version 
-			choice(choices:  [
+
+			// Asks for version
+			choice(choices: [
 				'v0.1', 
 				'v0.2', 
 				'v0.3', 
 				'v0.4', 
-				'v0.5'],  
-            description: 'Which version should we deploy?',  
-            name: 'Version')
-			
+				'v0.5'
+				], 
+			description: 'Which version should we deploy?', 
+			name: 'Version'),
+
+
 			// Asks for an input
 			string(defaultValue: 'v1', 
 			description: 'Please enter version number', 
 			name: 'APP_VERSION', 
 			trim: true)
+			])
 		])
-	])
 
 		// Pulls a repo from developer
 	stage("Pull Repo"){
-		git   'https://github.com/farrukh90/cool_website.git'
+		checkout([$class: 'GitSCM', branches: [[name: '*/FarrukH']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/farrukh90/cool_website.git']]])
 	}
 		//Installs web server on different environment
 	stage("Install Prerequisites"){
@@ -54,11 +57,15 @@ node {
 	}
 		//Restarts web server
 	stage("Restart web server"){
-		sh "ssh centos@${ENVIR}               sudo systemctl restart httpd"
+		ws("tmp/") {
+			sh "ssh centos@${ENVIR}               sudo systemctl restart httpd"
+		}
 	}
 
 		//Sends a message to slack
 	stage("Slack"){
-		slackSend color: '#BADA55', message: 'Hello, World!'
+		ws("mnt/"){
+			slackSend color: '#BADA55', message: 'Hello, World!'
+		}
 	}
 }
