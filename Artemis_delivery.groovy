@@ -13,7 +13,7 @@ node {
 	stage("Stage1"){
 		timestamps {
 			ws {
-		          checkout([$class: 'GitSCM', branches: [[name: 'dev']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/farrukh90/artemis.git']]])
+		          checkout([$class: 'GitSCM', branches: [[name:$'Version']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/farrukh90/artemis.git']]])
 		}
 	}
 }
@@ -44,3 +44,34 @@ node {
         } 
     } 
 }
+    stage("Push Image"){ 
+      timestamps { 
+	ws { 
+        sh ''' 
+         docker push 528547571480.dkr.ecr.us-east-1.amazonaws.com/artemis:${Version} 
+
+''' 
+
+} 
+
+} 
+
+} 
+
+stage("Send slack notifications"){ 
+
+timestamps { 
+
+ws { 
+
+echo "Slack" 
+
+//slackSend color: '#BADA55', message: 'Hello, World!' 
+
+} 
+
+} 
+
+} 
+
+} 
